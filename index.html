@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>一封给您的信</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #e8a0b4;
+    --rose-deep: #c7738e;
+    --gold: #c9a96e;
+    --gold-light: #f2d5a0;
+    --cream: #fdf6ee;
+    --cream-dark: #f0e4d0;
+    --text: #4a3728;
+    --text-soft: #7a6758;
+    --petal: #f4c7c7;
+    --petal-light: #fce4e4;
+    --night: #2c2430;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Noto Serif SC', serif;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+  }
+
+  /* ===== SCENE SYSTEM ===== */
+  .scene {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+  .scene.active { opacity: 1; pointer-events: auto; z-index: 10; }
+
+  /* ===== SCENE 1 — ENVELOPE ===== */
+  #scene1 {
+    background: linear-gradient(170deg, #fef5f0 0%, #fce4dc 30%, #f8d4cd 60%, #f0c8c0 100%);
+    overflow: hidden;
+  }
+  #scene1::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 15% 25%, rgba(232,160,180,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 75% 35%, rgba(201,169,110,0.10) 0%, transparent 50%),
+      radial-gradient(circle at 50% 70%, rgba(244,199,199,0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* floating petals */
+  .petal {
+    position: absolute;
+    width: 18px; height: 18px;
+    background: var(--petal);
+    border-radius: 50% 0 50% 0;
+    opacity: 0.5;
+    animation: petalFloat linear infinite;
+    pointer-events: none;
+  }
+  @keyframes petalFloat {
+    0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.5; }
+    50% { transform: translateY(-60px) rotate(180deg) scale(1.3); opacity: 0.8; }
+    100% { transform: translateY(0) rotate(360deg) scale(1); opacity: 0.5; }
+  }
+
+  .scene1-title {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    color: var(--rose-deep);
+    text-align: center;
+    line-height: 1.5;
+    letter-spacing: 0.08em;
+    margin-bottom: 60px;
+    animation: titleFadeIn 1.2s ease-out;
+    text-shadow: 0 2px 8px rgba(199,115,142,0.15);
+    z-index: 2;
+  }
+  .scene1-title .name {
+    display: block;
+    font-size: clamp(2.6rem, 6.5vw, 4.2rem);
+    color: #b35d78;
+    letter-spacing: 0.12em;
+    margin-bottom: 6px;
+  }
+  @keyframes titleFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* envelope */
+  .envelope-wrap {
+    position: relative; z-index: 3;
+    cursor: pointer;
+    animation: envelopeBounce 2s ease-in-out infinite;
+    transition: transform 0.3s;
+  }
+  .envelope-wrap:hover { transform: scale(1.05); }
+  .envelope-wrap:active { transform: scale(0.95); }
+  @keyframes envelopeBounce {
+    0%,100% { transform: translateY(0); }
+    25% { transform: translateY(-8px); }
+    75% { transform: translateY(4px); }
+  }
+
+  .envelope {
+    width: 180px; height: 120px;
+    position: relative;
+    filter: drop-shadow(0 8px 24px rgba(180,120,100,0.25));
+  }
+  .envelope-body {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, #fdf0e0 0%, #f8e4cc 40%, #f0d8b8 100%);
+    clip-path: polygon(0 15%, 50% 55%, 100% 15%, 100% 100%, 0 100%);
+    border-radius: 4px;
+  }
+  .envelope-flap {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 65%;
+    background: linear-gradient(180deg, #fef6e8 0%, #f4ddc0 100%);
+    clip-path: polygon(0 0, 50% 60%, 100% 0);
+    transform-origin: top center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 2;
+  }
+  .envelope.opened .envelope-flap {
+    transform: rotateX(160deg);
+  }
+  .envelope-seal {
+    position: absolute;
+    top: 38%; left: 50%; transform: translate(-50%, -50%);
+    width: 36px; height: 36px;
+    background: radial-gradient(circle, var(--rose) 0%, var(--rose-deep) 100%);
+    border-radius: 50%;
+    z-index: 3;
+    box-shadow: 0 2px 8px rgba(199,115,142,0.3);
+  }
+  .envelope-seal::after {
+    content: '♥';
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px;
+  }
+  .envelope-letter {
+    position: absolute;
+    top: 55%; left: 10%; right: 10%; bottom: 8%;
+    background: #fffef9;
+    border-radius: 2px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.5s 0.3s;
+    z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--text-soft);
+    letter-spacing: 0.05em;
+  }
+  .envelope.opened .envelope-letter {
+    opacity: 1; transform: translateY(-8px);
+  }
+
+  .envelope-hint {
+    margin-top: 24px;
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+    animation: hintPulse 2s ease-in-out infinite;
+    z-index: 2;
+  }
+  @keyframes hintPulse {
+    0%,100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* ===== SCENE 2 — TUNNEL ===== */
+  #scene2 {
+    background: radial-gradient(ellipse at center, #1a1a2e 0%, #0f0f1c 40%, #0a0a14 100%);
+    overflow: hidden;
+  }
+
+  .scene2-text {
+    color: #e8d5c4;
+    font-size: clamp(1.1rem, 2.8vw, 1.5rem);
+    text-align: center;
+    line-height: 2.2;
+    letter-spacing: 0.06em;
+    max-width: 500px;
+    padding: 0 30px;
+    animation: fadeInUp 1s ease-out;
+    z-index: 2;
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .tunnel-wrap {
+    position: relative;
+    margin-top: 50px;
+    z-index: 3;
+    cursor: pointer;
+  }
+
+  .tunnel {
+    width: 100px; height: 100px;
+    border-radius: 50%;
+    position: relative;
+    background: radial-gradient(circle, rgba(255,220,180,0.06) 0%, rgba(255,200,150,0.03) 30%, transparent 70%);
+    box-shadow:
+      0 0 40px rgba(255,200,160,0.08),
+      0 0 80px rgba(255,180,140,0.04),
+      inset 0 0 60px rgba(255,220,180,0.04);
+    animation: tunnelPulse 3s ease-in-out infinite;
+    transition: transform 0.3s;
+  }
+  .tunnel:hover { transform: scale(1.1); }
+  .tunnel:active { transform: scale(0.9); }
+
+  @keyframes tunnelPulse {
+    0%,100% { box-shadow: 0 0 40px rgba(255,200,160,0.08), 0 0 80px rgba(255,180,140,0.04), inset 0 0 60px rgba(255,220,180,0.04); }
+    50% { box-shadow: 0 0 60px rgba(255,200,160,0.18), 0 0 120px rgba(255,180,140,0.10), inset 0 0 90px rgba(255,220,180,0.10); }
+  }
+
+  .tunnel-ring {
+    position: absolute; inset: -12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,210,170,0.2);
+    animation: ringSpin 8s linear infinite;
+  }
+  .tunnel-ring:nth-child(2) { inset: -22px; animation-duration: 12s; animation-direction: reverse; }
+  .tunnel-ring:nth-child(3) { inset: -32px; animation-duration: 16s; border-color: rgba(255,190,150,0.12); }
+  @keyframes ringSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .tunnel-arrow {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,210,180,0.7);
+    font-size: 28px;
+    animation: arrowGlow 2s ease-in-out infinite;
+  }
+  @keyframes arrowGlow {
+    0%,100% { opacity: 0.4; text-shadow: 0 0 10px rgba(255,200,160,0.4); }
+    50% { opacity: 1; text-shadow: 0 0 30px rgba(255,200,160,0.9); }
+  }
+
+  .tunnel-hint {
+    margin-top: 16px;
+    color: rgba(255,210,180,0.5);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    animation: hintPulse 2s ease-in-out infinite;
+    z-index: 2;
+  }
+
+  /* tunnel transition overlay */
+  .tunnel-overlay {
+    position: fixed; inset: 0;
+    z-index: 999;
+    background: radial-gradient(circle at center,
+      rgba(30,20,40,0.95) 0%, rgba(20,10,25,0.98) 60%, rgba(0,0,0,1) 100%);
+    opacity: 0; pointer-events: none;
+    transition: opacity 0.3s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .tunnel-overlay.active { opacity: 1; }
+
+  .tunnel-light {
+    position: absolute;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,240,210,0.3) 0%, rgba(255,200,150,0.08) 40%, transparent 70%);
+    animation: lightApproach 1.5s ease-in forwards;
+  }
+  @keyframes lightApproach {
+    0% { transform: scale(0.1); opacity: 0.3; }
+    50% { transform: scale(0.6); opacity: 0.8; }
+    100% { transform: scale(3); opacity: 1; }
+  }
+
+  /* ===== SCENE 3 — FLOATING WORDS ===== */
+  #scene3 {
+    background: linear-gradient(160deg, #fef9f3 0%, #fdf2e8 30%, #fbe8da 60%, #f5ddd0 100%);
+    overflow: hidden;
+  }
+
+  .floating-container {
+    position: absolute; inset: 0;
+    z-index: 1;
+  }
+
+  .floating-word {
+    position: absolute;
+    font-family: 'Noto Serif SC', serif;
+    font-weight: 400;
+    color: var(--text);
+    text-shadow: 0 1px 4px rgba(74,55,40,0.08);
+    white-space: nowrap;
+    pointer-events: none;
+    animation: floatWord var(--duration) ease-in-out infinite;
+    animation-delay: var(--delay);
+    opacity: 0.85;
+  }
+
+  @keyframes floatWord {
+    0%   { transform: translate(var(--startX), var(--startY)) scale(0.9); opacity: 0.4; }
+    15%  { transform: translate(calc(var(--startX) + 40px), calc(var(--startY) - 30px)) scale(1); opacity: 0.9; }
+    30%  { transform: translate(calc(var(--startX) - 20px), calc(var(--startY) - 80px)) scale(1.05); opacity: 1; }
+    50%  { transform: translate(calc(var(--startX) + 50px), calc(var(--startY) - 150px)) scale(0.95); opacity: 0.85; }
+    70%  { transform: translate(calc(var(--startX) - 40px), calc(var(--startY) - 200px)) scale(1); opacity: 0.7; }
+    85%  { transform: translate(calc(var(--startX) + 30px), calc(var(--startY) - 250px)) scale(0.9); opacity: 0.5; }
+    100% { transform: translate(var(--startX), var(--startY)) scale(0.85); opacity: 0.3; }
+  }
+
+  /* special emphasis words */
+  .floating-word.emphasis {
+    font-weight: 700;
+    color: var(--rose-deep);
+    font-size: 1.4em !important;
+    text-shadow: 0 2px 12px rgba(199,115,142,0.2);
+  }
+  .floating-word.gold {
+    font-weight: 600;
+    color: #b8863a;
+    font-size: 1.3em !important;
+    text-shadow: 0 2px 10px rgba(184,134,58,0.15);
+  }
+
+  /* scene 3 decorations */
+  .scene3-sparkle {
+    position: absolute;
+    width: 4px; height: 4px;
+    background: var(--gold-light);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: sparkle 3s ease-in-out infinite;
+    animation-delay: var(--sd);
+  }
+  @keyframes sparkle {
+    0%,100% { opacity: 0; transform: scale(0.5); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+
+  .scene3-footer {
+    position: absolute; bottom: 30px;
+    z-index: 2;
+    color: var(--rose-deep);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    animation: footerFade 3s ease-in-out infinite;
+    text-align: center;
+  }
+  @keyframes footerFade {
+    0%,100% { opacity: 0.5; }
+    50% { opacity: 0.9; }
+  }
+
+  /* ===== GLOBAL DECOR ===== */
+  .bg-hearts {
+    position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== SCENE 1: ENVELOPE ========== -->
+<div class="scene active" id="scene1">
+  <h1 class="scene1-title">
+    <span class="name">刘妍君女士</span>
+    这是一封专为您制作的信
+  </h1>
+
+  <div class="envelope-wrap" id="envelopeWrap" onclick="openEnvelope()">
+    <div class="envelope" id="envelope">
+      <div class="envelope-body"></div>
+      <div class="envelope-flap"></div>
+      <div class="envelope-seal"></div>
+      <div class="envelope-letter">点击打开信封</div>
+    </div>
+  </div>
+  <p class="envelope-hint">👆 点击信封打开</p>
+</div>
+
+<!-- ========== SCENE 2: TUNNEL ========== -->
+<div class="scene" id="scene2">
+  <p class="scene2-text">
+    请原谅我不能在身边陪您过生日<br>
+    现在也没有那个能力购买好的礼物<br>
+    在您生日之时暨考试前夕<br>
+    我希望通过无数句话表达我的爱
+  </p>
+
+  <div class="tunnel-wrap" onclick="enterTunnel()">
+    <div class="tunnel">
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-ring"></div>
+      <div class="tunnel-arrow">✦</div>
+    </div>
+  </div>
+  <p class="tunnel-hint">👆 点击穿越隧道</p>
+</div>
+
+<!-- ========== TUNNEL TRANSITION OVERLAY ========== -->
+<div class="tunnel-overlay" id="tunnelOverlay">
+  <div class="tunnel-light"></div>
+</div>
+
+<!-- ========== SCENE 3: FLOATING WORDS ========== -->
+<div class="scene" id="scene3">
+  <div class="floating-container" id="floatingContainer"></div>
+  <div class="scene3-footer">
+    ♥ 永远爱您的孩子 ♥
+  </div>
+</div>
+
+<script>
+// ===== PETALS GENERATION =====
+(function createPetals() {
+  const scene1 = document.getElementById('scene1');
+  for (let i = 0; i < 20; i++) {
+    const petal = document.createElement('div');
+    petal.className = 'petal';
+    petal.style.left = Math.random() * 100 + '%';
+    petal.style.top = Math.random() * 100 + '%';
+    petal.style.animationDuration = (4 + Math.random() * 8) + 's';
+    petal.style.animationDelay = Math.random() * 6 + 's';
+    petal.style.width = (10 + Math.random() * 16) + 'px';
+    petal.style.height = (10 + Math.random() * 16) + 'px';
+    scene1.appendChild(petal);
+  }
+})();
+
+// ===== SCENE MANAGEMENT =====
+function switchScene(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.classList.remove('active');
+  to.classList.add('active');
+}
+
+// ===== SCENE 1 → SCENE 2 =====
+function openEnvelope() {
+  const envelope = document.getElementById('envelope');
+  if (envelope.classList.contains('opened')) return;
+  envelope.classList.add('opened');
+
+  // Play a subtle chime
+  playChime(600);
+
+  setTimeout(() => {
+    switchScene('scene1', 'scene2');
+  }, 1200);
+}
+
+// ===== SCENE 2 → TUNNEL → SCENE 3 =====
+function enterTunnel() {
+  const overlay = document.getElementById('tunnelOverlay');
+  overlay.classList.add('active');
+
+  playChime(400);
+
+  setTimeout(() => {
+    overlay.classList.remove('active');
+    switchScene('scene2', 'scene3');
+    initFloatingWords();
+  }, 1800);
+}
+
+// ===== SIMPLE CHIME =====
+function playChime(freq) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.8);
+  } catch(e) {}
+}
+
+// ===== SCENE 3: FLOATING WORDS =====
+const WORDS = [
+  '记得按时吃三餐，不要为了减肥让身体营养不足',
+  '面对考试尽力而为，累了要允许自己休息',
+  '不用太挂念我，我能照顾好自己',
+  '面对看不惯的人和事不要放在心上',
+  '回答你最在乎的问题：你是最好的mother',
+  '不要老是觉得对不起我，我的亲人对我都是最好的',
+  '考试不要紧张，你爱的人都在背后支持你',
+  '生日快乐！！！',
+  '考试加油！！！',
+  '对自己好一点，不要老想着对别人好委屈自己',
+  '上班路上不要看手机，注意安全',
+  '晚上困了就早点睡，尽量不要熬夜',
+  '出门记得拿钥匙，不要把钥匙又锁在家里了',
+  '多宽容一下庆哥，他习惯不思考太多但没有别的意思',
+  '不用担心我谈恋爱的事，一切随缘',
+  '原谅我不喜欢拍照的习惯，我现在也在慢慢改变了',
+  '想聊天就打电话给我，什么事也没有这个重要',
+  '永远爱你和所有亲人',
+  '原谅我有时候不懂事闹别扭'
+];
+
+const EMPHASIS = [
+  '生日快乐！！！',
+  '考试加油！！！',
+  '你是最好的mother',
+  '永远爱你和所有亲人'
+];
+
+function initFloatingWords() {
+  const container = document.getElementById('floatingContainer');
+  if (container.children.length > 0) return; // already initialized
+  container.innerHTML = '';
+
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  WORDS.forEach((text, i) => {
+    const el = document.createElement('div');
+    el.className = 'floating-word';
+    if (EMPHASIS.includes(text)) {
+      el.classList.add(text.includes('生日') || text.includes('考试') ? 'emphasis' : 'emphasis');
+    }
+    el.textContent = text;
+
+    // Random size
+    const size = 0.9 + Math.random() * 0.7;
+    el.style.fontSize = (size * (vw < 600 ? 1.1 : 1.4)) + 'rem';
+
+    // Random starting position
+    const startX = Math.random() * (vw * 0.8) - vw * 0.4;
+    const startY = Math.random() * (vh * 0.6) - vh * 0.3;
+    el.style.setProperty('--startX', startX + 'px');
+    el.style.setProperty('--startY', startY + 'px');
+
+    // Apply initial transform for positioning
+    el.style.left = '50%';
+    el.style.top = '50%';
+    el.style.transform = `translate(${startX}px, ${startY}px)`;
+
+    // Animation params
+    const duration = 18 + Math.random() * 22; // 18-40s per cycle, slow enough to read
+    const delay = Math.random() * duration; // stagger start times
+    el.style.setProperty('--duration', duration + 's');
+    el.style.setProperty('--delay', delay + 's');
+
+    // Color variation
+    const colors = [
+      '#4a3728', '#6b5748', '#8a6e58', '#b35d78',
+      '#c7738e', '#9b6b4a', '#7a5038', '#b8863a'
+    ];
+    el.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+    container.appendChild(el);
+  });
+
+  // Add sparkles
+  for (let i = 0; i < 30; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'scene3-sparkle';
+    sparkle.style.left = Math.random() * 100 + '%';
+    sparkle.style.top = Math.random() * 100 + '%';
+    sparkle.style.setProperty('--sd', Math.random() * 3 + 's');
+    container.appendChild(sparkle);
+  }
+}
+
+// Re-init on resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    const container = document.getElementById('floatingContainer');
+    if (document.getElementById('scene3').classList.contains('active')) {
+      container.innerHTML = '';
+      initFloatingWords();
+    }
+  }, 500);
+});
+
+// Keyboard shortcuts for testing
+document.addEventListener('keydown', (e) => {
+  if (e.key === '1') { switchScene('scene2','scene1'); switchScene('scene3','scene1'); document.getElementById('scene1').classList.add('active'); document.getElementById('envelope').classList.remove('opened'); }
+  if (e.key === '2') { switchScene('scene1','scene2'); switchScene('scene3','scene2'); document.getElementById('scene2').classList.add('active'); }
+  if (e.key === '3') { switchScene('scene1','scene3'); switchScene('scene2','scene3'); document.getElementById('scene3').classList.add('active'); initFloatingWords(); }
+});
+</script>
+</body>
+</html>
