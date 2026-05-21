@@ -315,13 +315,12 @@
   }
 
   @keyframes floatWord {
-    0%   { transform: translate(var(--startX), var(--startY)) scale(0.9); opacity: 0.4; }
-    15%  { transform: translate(calc(var(--startX) + 40px), calc(var(--startY) - 30px)) scale(1); opacity: 0.9; }
-    30%  { transform: translate(calc(var(--startX) - 20px), calc(var(--startY) - 80px)) scale(1.05); opacity: 1; }
-    50%  { transform: translate(calc(var(--startX) + 50px), calc(var(--startY) - 150px)) scale(0.95); opacity: 0.85; }
-    70%  { transform: translate(calc(var(--startX) - 40px), calc(var(--startY) - 200px)) scale(1); opacity: 0.7; }
-    85%  { transform: translate(calc(var(--startX) + 30px), calc(var(--startY) - 250px)) scale(0.9); opacity: 0.5; }
-    100% { transform: translate(var(--startX), var(--startY)) scale(0.85); opacity: 0.3; }
+    0%   { transform: translate(var(--startX), var(--startY)) scale(0.85); opacity: 0.35; }
+    20%  { transform: translate(calc(var(--startX) + var(--driftX)), calc(var(--startY) + var(--driftY))) scale(1); opacity: 0.95; }
+    40%  { transform: translate(calc(var(--startX) + var(--driftX) * 0.3), calc(var(--startY) - var(--driftY) * 0.5)) scale(1.05); opacity: 1; }
+    60%  { transform: translate(calc(var(--startX) - var(--driftX) * 0.5), calc(var(--startY) - var(--driftY))) scale(0.95); opacity: 0.9; }
+    80%  { transform: translate(calc(var(--startX) - var(--driftX) * 0.2), calc(var(--startY) + var(--driftY) * 0.3)) scale(1); opacity: 0.7; }
+    100% { transform: translate(var(--startX), var(--startY)) scale(0.85); opacity: 0.35; }
   }
 
   /* special emphasis words */
@@ -330,12 +329,6 @@
     color: var(--rose-deep);
     font-size: 1.4em !important;
     text-shadow: 0 2px 12px rgba(199,115,142,0.2);
-  }
-  .floating-word.gold {
-    font-weight: 600;
-    color: #b8863a;
-    font-size: 1.3em !important;
-    text-shadow: 0 2px 10px rgba(184,134,58,0.15);
   }
 
   /* scene 3 decorations */
@@ -368,10 +361,161 @@
     50% { opacity: 0.9; }
   }
 
-  /* ===== GLOBAL DECOR ===== */
-  .bg-hearts {
-    position: fixed; inset: 0;
-    pointer-events: none; z-index: 0;
+  /* ===== SCENE 4 — BIRTHDAY CAKE ===== */
+  #scene4 {
+    background: linear-gradient(170deg, #fef5f0 0%, #fce4dc 30%, #f8d4cd 60%, #f0c8c0 100%);
+    overflow: hidden;
+  }
+  #scene4::before {
+    content: ''; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(255,215,0,0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(232,160,180,0.10) 0%, transparent 50%),
+      radial-gradient(circle at 50% 60%, rgba(255,200,150,0.12) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .scene4-birthday {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 700;
+    color: #c7738e;
+    text-align: center;
+    letter-spacing: 0.12em;
+    z-index: 2;
+    animation: birthdayBounce 1s ease-out, birthdayGlow 2s ease-in-out 1s infinite;
+    text-shadow: 0 4px 20px rgba(199,115,142,0.2);
+    margin-bottom: 40px;
+  }
+  @keyframes birthdayBounce {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.15); }
+    80% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes birthdayGlow {
+    0%,100% { text-shadow: 0 4px 20px rgba(199,115,142,0.2); }
+    50% { text-shadow: 0 4px 40px rgba(199,115,142,0.5), 0 0 80px rgba(255,200,100,0.3); }
+  }
+
+  /* CSS Cake */
+  .cake-wrap {
+    position: relative; z-index: 3;
+    display: flex; flex-direction: column; align-items: center;
+    animation: cakeRise 1.2s ease-out;
+  }
+  @keyframes cakeRise {
+    from { transform: translateY(80px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .cake-plate {
+    width: 200px; height: 16px;
+    background: linear-gradient(180deg, #f5f0e8 0%, #e8dfd0 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 12px rgba(150,120,80,0.2);
+  }
+
+  .cake-body {
+    position: relative;
+    width: 170px;
+  }
+
+  .cake-layer {
+    width: 100%;
+    border-radius: 8px;
+    position: relative;
+  }
+  .cake-layer.bottom {
+    height: 52px;
+    background: linear-gradient(180deg, #fce4d0 0%, #f5d0b0 100%);
+    margin-top: -4px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.4);
+  }
+  .cake-layer.middle {
+    height: 44px;
+    width: 140px;
+    margin: -4px auto 0;
+    background: linear-gradient(180deg, #fef0e0 0%, #fce4d0 100%);
+    border-radius: 6px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  }
+  .cake-layer.top {
+    height: 38px;
+    width: 110px;
+    margin: -4px auto 0;
+    background: linear-gradient(180deg, #fff8f0 0%, #fef0e0 100%);
+    border-radius: 6px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.6);
+  }
+
+  /* frosting drips */
+  .frosting {
+    position: absolute; top: -8px; left: -4px; right: -4px;
+    height: 16px;
+  }
+  .frosting::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: #fff8f0;
+    border-radius: 20px 20px 4px 4px;
+  }
+  .frosting-drip {
+    position: absolute; top: 8px;
+    width: 12px; height: 14px;
+    background: #fff8f0;
+    border-radius: 0 0 6px 6px;
+  }
+  .frosting-drip:nth-child(1) { left: 10px; }
+  .frosting-drip:nth-child(2) { left: 35px; width: 10px; height: 11px; }
+  .frosting-drip:nth-child(3) { left: 60px; height: 16px; }
+  .frosting-drip:nth-child(4) { left: 85px; width: 11px; height: 12px; }
+
+  /* candles */
+  .candles {
+    display: flex; gap: 12px;
+    margin-top: -20px;
+    z-index: 5;
+    position: relative;
+  }
+  .candle {
+    width: 8px; height: 36px;
+    background: linear-gradient(180deg, #ffe4c4 0%, #f5cba0 80%);
+    border-radius: 3px 3px 2px 2px;
+    position: relative;
+    box-shadow: inset 0 -4px 6px rgba(180,130,80,0.2);
+  }
+  .candle.flame {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    width: 12px; height: 18px;
+    background: radial-gradient(ellipse at bottom, #fff7a0 0%, #ffb830 50%, #ff6a00 100%);
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    animation: flameDance 0.6s ease-in-out infinite alternate;
+    box-shadow: 0 0 12px rgba(255,150,30,0.5);
+  }
+  @keyframes flameDance {
+    0% { transform: translateX(-50%) scale(1, 1); }
+    100% { transform: translateX(-50%) scale(0.85, 1.2); }
+  }
+
+  .cake-decor {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    display: flex; align-items: center; justify-content: center;
+    color: #d4956b;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+  }
+
+  .scene4-signature {
+    position: absolute; bottom: 40px; right: 40px;
+    z-index: 2;
+    color: var(--rose-deep);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    animation: fadeInUp 1.5s ease-out 0.8s both;
+    text-align: right;
   }
 </style>
 </head>
@@ -401,7 +545,7 @@
     请原谅我不能在身边陪您过生日<br>
     现在也没有那个能力购买好的礼物<br>
     在您生日之时暨考试前夕<br>
-    我希望通过无数句话表达我的爱
+    我希望通过一些话表达我的爱
   </p>
 
   <div class="tunnel-wrap" onclick="enterTunnel()">
@@ -421,11 +565,43 @@
 </div>
 
 <!-- ========== SCENE 3: FLOATING WORDS ========== -->
-<div class="scene" id="scene3">
+<div class="scene" id="scene3" onclick="goToScene4()">
   <div class="floating-container" id="floatingContainer"></div>
   <div class="scene3-footer">
-    ♥ 永远爱您的孩子 ♥
+    ♥ 点击任意位置继续 ♥
   </div>
+</div>
+
+<!-- ========== SCENE 4: BIRTHDAY CAKE ========== -->
+<div class="scene" id="scene4">
+  <h1 class="scene4-birthday">生日快乐！</h1>
+
+  <div class="cake-wrap">
+    <div class="candles">
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle" style="height:40px"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+      <div class="candle" style="height:42px"><div class="flame"></div></div>
+      <div class="candle"><div class="flame"></div></div>
+    </div>
+    <div class="cake-body">
+      <div class="cake-layer top">
+        <div class="frosting">
+          <div class="frosting-drip"></div>
+          <div class="frosting-drip"></div>
+          <div class="frosting-drip"></div>
+          <div class="frosting-drip"></div>
+        </div>
+      </div>
+      <div class="cake-layer middle"></div>
+      <div class="cake-layer bottom">
+        <div class="cake-decor">♥</div>
+      </div>
+    </div>
+    <div class="cake-plate"></div>
+  </div>
+
+  <div class="scene4-signature">—— 永远爱你的儿子</div>
 </div>
 
 <script>
@@ -459,12 +635,20 @@ function openEnvelope() {
   if (envelope.classList.contains('opened')) return;
   envelope.classList.add('opened');
 
-  // Play a subtle chime
   playChime(600);
 
   setTimeout(() => {
     switchScene('scene1', 'scene2');
   }, 1200);
+}
+
+// ===== SCENE 3 → SCENE 4 =====
+let scene4Triggered = false;
+function goToScene4() {
+  if (scene4Triggered) return;
+  scene4Triggered = true;
+  playChime(500);
+  switchScene('scene3', 'scene4');
 }
 
 // ===== SCENE 2 → TUNNEL → SCENE 3 =====
@@ -498,7 +682,7 @@ function playChime(freq) {
 }
 
 // ===== SCENE 3: FLOATING WORDS =====
-const WORDS = [
+const BASE_WORDS = [
   '记得按时吃三餐，不要为了减肥让身体营养不足',
   '面对考试尽力而为，累了要允许自己休息',
   '不用太挂念我，我能照顾好自己',
@@ -520,6 +704,8 @@ const WORDS = [
   '原谅我有时候不懂事闹别扭'
 ];
 
+const WORDS = [...BASE_WORDS, ...BASE_WORDS, ...BASE_WORDS, ...BASE_WORDS];
+
 const EMPHASIS = [
   '生日快乐！！！',
   '考试加油！！！',
@@ -529,7 +715,7 @@ const EMPHASIS = [
 
 function initFloatingWords() {
   const container = document.getElementById('floatingContainer');
-  if (container.children.length > 0) return; // already initialized
+  if (container.children.length > 0) return;
   container.innerHTML = '';
 
   const vw = window.innerWidth;
@@ -539,32 +725,34 @@ function initFloatingWords() {
     const el = document.createElement('div');
     el.className = 'floating-word';
     if (EMPHASIS.includes(text)) {
-      el.classList.add(text.includes('生日') || text.includes('考试') ? 'emphasis' : 'emphasis');
+      el.classList.add('emphasis');
     }
     el.textContent = text;
 
-    // Random size
-    const size = 0.9 + Math.random() * 0.7;
-    el.style.fontSize = (size * (vw < 600 ? 1.1 : 1.4)) + 'rem';
+    const size = 0.8 + Math.random() * 0.8;
+    el.style.fontSize = (size * (vw < 600 ? 1.0 : 1.3)) + 'rem';
 
-    // Random starting position
-    const startX = Math.random() * (vw * 0.8) - vw * 0.4;
-    const startY = Math.random() * (vh * 0.6) - vh * 0.3;
+    // Spread across entire viewport
+    const startX = Math.random() * vw * 0.94 - vw * 0.47;
+    const startY = Math.random() * vh * 0.9 - vh * 0.45;
     el.style.setProperty('--startX', startX + 'px');
     el.style.setProperty('--startY', startY + 'px');
 
-    // Apply initial transform for positioning
+    // Drift distance for wide animation orbits
+    const driftX = (60 + Math.random() * 180) * (Math.random() > 0.5 ? 1 : -1) + 'px';
+    const driftY = (60 + Math.random() * 160) * (Math.random() > 0.5 ? 1 : -1) + 'px';
+    el.style.setProperty('--driftX', driftX);
+    el.style.setProperty('--driftY', driftY);
+
     el.style.left = '50%';
     el.style.top = '50%';
     el.style.transform = `translate(${startX}px, ${startY}px)`;
 
-    // Animation params
-    const duration = 18 + Math.random() * 22; // 18-40s per cycle, slow enough to read
-    const delay = Math.random() * duration; // stagger start times
+    const duration = 22 + Math.random() * 30;
+    const delay = Math.random() * duration;
     el.style.setProperty('--duration', duration + 's');
     el.style.setProperty('--delay', delay + 's');
 
-    // Color variation
     const colors = [
       '#4a3728', '#6b5748', '#8a6e58', '#b35d78',
       '#c7738e', '#9b6b4a', '#7a5038', '#b8863a'
@@ -575,7 +763,7 @@ function initFloatingWords() {
   });
 
   // Add sparkles
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < 40; i++) {
     const sparkle = document.createElement('div');
     sparkle.className = 'scene3-sparkle';
     sparkle.style.left = Math.random() * 100 + '%';
@@ -602,7 +790,8 @@ window.addEventListener('resize', () => {
 document.addEventListener('keydown', (e) => {
   if (e.key === '1') { switchScene('scene2','scene1'); switchScene('scene3','scene1'); document.getElementById('scene1').classList.add('active'); document.getElementById('envelope').classList.remove('opened'); }
   if (e.key === '2') { switchScene('scene1','scene2'); switchScene('scene3','scene2'); document.getElementById('scene2').classList.add('active'); }
-  if (e.key === '3') { switchScene('scene1','scene3'); switchScene('scene2','scene3'); document.getElementById('scene3').classList.add('active'); initFloatingWords(); }
+  if (e.key === '3') { switchScene('scene1','scene3'); switchScene('scene2','scene3'); switchScene('scene4','scene3'); document.getElementById('scene3').classList.add('active'); initFloatingWords(); scene4Triggered = false; }
+  if (e.key === '4') { switchScene('scene1','scene4'); switchScene('scene2','scene4'); switchScene('scene3','scene4'); document.getElementById('scene4').classList.add('active'); scene4Triggered = true; }
 });
 </script>
 </body>
